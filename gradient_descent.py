@@ -42,8 +42,8 @@ def train_model(normalized, max_iter):
     return weights, loss_function
 
 
-# Stochastic Gradient Descent
-def SGD(weights):
+# Randomized-mini-batch Stochastic Gradient Descent
+def SGD_minibatch(weights):
 
     # Select a batch of data to train
     start = random.randint(0, len(norm_list) - 4)
@@ -72,7 +72,42 @@ def SGD(weights):
     print(loss_function)
     return weights
 
-print (SGD(SGD(SGD([0.0, 0.0, 0.0]))))
+
+# print (SGD_minibatch(SGD_minibatch(SGD_minibatch([0.0, 0.0, 0.0]))))
+
+# Stochastic Gradient Descent
+def SGD(weights):
+
+    data = norm_list
+
+    # Shuffle data
+    shuffled = []
+    for i in range(len(norm_list)):
+        element = random.choice(data)
+        data.remove(element)
+        shuffled.append(element)
+
+    loss_function = 0
+
+    # Each update of w uses only a single data point X^(i)
+    for d in shuffled:
+        g0 = weights[0] - 0.1 * (weights[0] + weights[1] * d[0] + weights[2] * d[1] - d[2])  # alpha set to 0.1
+        g1 = weights[1] - 0.1 * (weights[0] + weights[1] * d[0] + weights[2] * d[1] - d[2]) * d[0]
+        g2 = weights[2] - 0.1 * (weights[0] + weights[1] * d[0] + weights[2] * d[1] - d[2]) * d[1]
+
+        # Update weights
+        weights[0] = g0
+        weights[1] = g1
+        weights[2] = g2
+
+        loss_function = sum([(weights[0] + weights[1] * shuffled[i][0] + weights[2] * shuffled[i][1] - shuffled[i][2])** 2 for i in range(len(shuffled))])
+        loss_function = loss_function * 1/(2*len(shuffled))
+    print(loss_function)
+    return weights
+
+
+print(SGD([341859.20577729295, 107831.74599088964, -2531.1739425848536]))
+
 
 # Plot J(w) for with different alpha and number of iterations
 def plot():
